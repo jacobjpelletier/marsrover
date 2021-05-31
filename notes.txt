@@ -1,0 +1,15 @@
+A. Functional Programming Intro
+    1. Why Do I need FP?
+        a. First and probably most importantly, having a solid understanding of another programming paradigm will help
+            you write better code - even if you never end up using a functional language or framework in your job.
+        b. It is on the rise, more languages are choosing at least functional-inspired styles, and understanding where
+           these ideas are coming from will help you learn them faster
+        c. It will make learning React less mysterious. React and Redux both heavily ascribe to functional principles.
+    2. https://www.youtube.com/watch?v=eis11j_iGMs
+        a. y combinator: https://www.youtube.com/watch?v=9T8A89jgeTI
+        b. Variable values cannot be edited, but.. functions can return new values.
+        c. Programs can be expressed completely with... chains of functions and inputs
+        d. Functions... have no effct except the values they return
+        e. Dr. Church described programs as assembly lines of functions that... are like black boxes, you cannot
+            see the logic inside
+    3.
