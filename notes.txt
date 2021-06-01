@@ -12,4 +12,244 @@ A. Functional Programming Intro
         d. Functions... have no effct except the values they return
         e. Dr. Church described programs as assembly lines of functions that... are like black boxes, you cannot
             see the logic inside
-    3.
+B. Programming Paradigms
+    1. paradigms
+        a. imperative
+            - The Imperative Paradigm solves problems with an explicit sequence of commands to get from point A to point
+            B. If the code or comments read like a recipe or handbook, it's likely to be imperative. Many programming
+            languages, especially dynamic ones, including Javascript, PHP, and Python can be used to write imperative
+            programs.
+        b. functional:
+            - The Functional Paradigm solves problems with functions that hold simple pieces of logic and can
+            be chained together to accomplish more complex actions.
+        c. OOP
+            - The Object-Oriented Paradigm solves problems by defining objects that can hold both values (properties)
+            and functionality (methods).
+         d. https://cs.lmu.edu/~ray/notes/paradigms/
+    2. why learn paradigms?
+        a. Javascript is a dynamic language, so you can choose which paradigm to use
+        b. how do you choose a paradigm?
+            - Here are some things to consider. If your application is inherently state-based, like maybe a simple game,
+             blog, or a GUI, it is likely a good candidate for Object Oriented programming, because the entities in an
+             Object Oriented program are easier to reason about.
+            - On the other hand, if you have a large program that needs to have a high degree of reliability, or if you
+            need to manage lots of user interactions and fast updates, then it might be a good sign that you could write
+            a Functional program. Functional programs shine especially when you need to leverage concurrency. As chips
+            have become about as fast as we can make them, the way to get faster computers has been to add more cores.
+            But those cores are useless to make our programs faster unless we can use them well. For a program that
+            manages concurrency well, you probably would want to rethink your decision to use JavaScript, but the
+            Functional Paradigm would be the best choice.
+            - It turns out though, that the choice of programming paradigm is quite personal and subjective among
+            developers. Many people will learn a paradigm and more or less stick to it. For instance, a person who is
+            comfortable with Object Oriented programs will trend towards creating more Object Oriented programs, because
+            at the end of the day, we want to build things more than we want to think about building things.
+    3. comparing paradigms
+        a. imperative
+
+            let name = 'Captain Kirk'
+            let hour = new Date().getHours()
+
+            let greeting = ''
+
+            if (hour <= 6) {
+                greeting = 'Good Morning, '
+            } else if (hour >= 17) {
+                greeting = 'Good Evening, '
+            } else {
+                greeting = 'Hello, '
+            }
+
+            greeting += name + '.'
+
+            console.log(greeting)
+
+        b. functional
+
+            const greet = (name) => (salutation) => `${salutation}, ${name}.`
+
+            const determineSalutation = (callback) => {
+                const hour = new Date().getHours()
+
+                if (hour <= 6) {
+                    return callback('Good Morning')
+                } else if (hour >= 17) {
+                    return callback('Good Evening')
+                } else {
+                    return callback('Hello')
+                }
+            }
+
+            let result = determineSalutation(greet('Captain Kirk'))
+            console.log(result)
+            //expected output: Hello, Captain Kirk
+
+        c. oop
+
+            class Person {
+                constructor(name){
+                    this.name = name
+                }
+
+                determineSalutation(date){
+                    const hour = (date && date.getHours()) || new Date().getHours()
+
+                    if (hour <= 6) {
+                        return "Good Morning"
+                    } else if (hour >= 17) {
+                        return "Good Evening"
+                    } else {
+                        return "Hello"
+                    }
+                }
+
+                greet() {
+                    return `${this.determineSalutation()}\u00A0${this.name}`
+                    // using JavaScript template literal: `${}`
+                    // \u00A0 is a symbol to add a space in the template literal
+                }
+            }
+
+            const kirk = new Person("Kirk", "Captain")
+            console.log(kirk.greet())
+            //expected output: Hello, Captain Kirk
+
+            class WarpDrive {
+                // Creating a class requires us to decide what properties to give it.
+                // Take a look at the imperative program - everything that was a global variable there, we want to make a property on our class
+                constructor(type, recipient) {
+                    this.type = type
+                    this.status = 'active'
+                    this.warp = 2
+                    this.recipient = recipient ? recipient : 'Captain'
+                }
+
+                // The bulk of the logic that the imperative program had in the global scope, we turn into methods
+                // The logic will stay mostly the same but we now need to reference values that belong to this instance of class WarpDrive, instead of global variables
+
+                status_report() {
+                    if (this.status === 'active' && this.warp <= 4) {
+                        return this.recipient + ', the engines are active and we could be going faster'
+                    } else if (this.status === 'active' && this.warp > 4) {
+                        return this.recipient + ', the engines are active and we are going ' + this.warp
+                    } else if (this.status === 'down') {
+                        return this.recipient + ', the engines are down'
+                    } else {
+                        return this.recipient + ', the comms are down and we can`t reach engineering'
+                    }
+                }
+
+                // Anytime you see a variable changing in the imperative program, it is a sign that a method will be needed in this class
+                // I added these setter methods as examples for how you could update the state of the object to test the various status_report responses
+
+                set_status(status) {
+                    this.status = status
+                }
+
+                set_warp(integer) {
+                    this.warp = integer
+                }
+            }
+
+            // Because we are working with classes now, we have to instantiate the class before we use it
+
+            let enterprise_warp = new WarpDrive('Dilithium Chrystal')
+
+            // NOTE: This is a big win for the object oriented style - it is so easy to make multiple instances of WarpDrive
+            // Our program could simultaneously reference as many warp drive as instances as we want -- how would you do that in the imperative program?
+
+            enterprise_warp.set_warp(2)
+
+            console.log(enterprise_warp.status_report())
+
+            // expected output: Captain, the engines are active and we could go faster.
+
+    4. Foundations of FP
+        a. pure functions
+            - Pure functions are a simple concept with big implications. And to start off with, I’m pretty sure you have
+                 already written a pure function! If you started off learning to write functions like this:
+
+                function add(x,y) {
+                    return x + y
+                }
+
+            - https://mostly-adequate.gitbooks.io/mostly-adequate-guide/ch03.html
+
+        b. Summary on pure functions
+            - We just learned about side effects, which modify state and don't come from the return statement of that
+            function. So now we have everything we need to understand pure functions. Same inputs get the same output
+            and the return value is the total effect of running the function.
+            - What do we get from writing pure functions? To sum it up in one word, I would say confidence. But there is
+            a lot more to it than that. Here are some last points to consider:
+
+                - If we can count on a function to produce the same result no matter where in the program it runs, then we
+                don’t have to be afraid of calling it anywhere. It makes my functions easy to reuse.
+                If a function has no side effects, then we remove the mental load of needing to remember them. I have
+                - confidence about what my functions do, and the effect they will have on my app. That confidence means
+                that I can scale things more easily and alter programs with less fear.
+
+            - immutability
+                - Another major tenant of functional programming is that we do not “edit” things; we make new things.
+                - For instance, if I had a set of notes for a class, and you wanted to borrow them, when you see
+                something that you wanted to edit or add, you wouldn’t make those edits on my notes...hopefully.
+                Instead, you would make a fresh copy of my notes and make your changes there. That would preserve my
+                copy and let you have your new notes; in essence, that is what functional programming wants.
+                - Editing - more commonly referred to in development as “mutating” the same thing over and over again
+                makes it hard to know what copy you are looking at, and is prone to errors. At multiple points later in
+                the course, we will take a look into how we can create immutable values in our JavaScript programs.
+                For now though, this will hopefully explain why we favor ‘const’ variables over ‘let’ variables in this
+                course.
+            - New Terms
+                - Pure Functions - A function that will always return the same output if given the same input, and
+                which has no side effects.
+                - Side effects - An effect on your overall program from running a function, that did not come from the
+                return statement of that function.
+                - Immutable - Unchanging. Immutable values are ones which, once declared, cannot be changed.
+            - summary
+                - The content we learned in this section has an amazing ability to improve your everyday coding skills,
+                    even if you aren’t writing a Functional program.
+                - You learned that pure functions are completely predictable in their outcome, and as a developer,
+                    predictable is exactly what you want your programs to be.
+                - Avoiding side effects is partly what makes pure functions predictable, and they also make code easier
+                     to read, and reduce the interdependence of programs and functions.
+                - We also covered a little bit of how immutable values make it easier to track changes over time, and
+                    that it is preferable to make a copy of a value before editing it, rather than making changes to
+                    the original.
+                - We have now covered the core concepts of Functional Programming. There will be a few more throughout
+                    the course, but even using and understanding just these have the power to improve the quality and
+                    clarity of your programs.
+    5. functional pros and cons
+        a. Functional Programming believes that values shouldn’t be sloppily edited, but rather replaced with fresh
+        values every time. It also ensures that state changes in very predictable places -- the return values of
+        functions. You’ll see that a lot of these pros and cons have to do with how state is handled.
+        b. pros
+            - Easier to test
+              Because every function is pure, we know that the return value is the sum of the function, and is the only
+              part that needs to be tested. Functions that avoid side effects are easier to test.
+
+            - More predictable code
+              Functions that avoid side effects and the use of immutable values makes changes in the programs more
+              visible. By definition, pure functions always return the same value when given the same inputs. This
+              predictability is the backbone of success with Functional Programming
+
+            - Easier to edit and expand
+              Because pure functions return the same value every time, and perfectly encapsulate their logic in the
+              return statement, it means that a function could be copied and pasted to a new part of a program, or
+              moved to an entirely different program, and it would still always produce the same result. Functions with
+              side effects cannot be moved without the possibility of breaking something.
+        c. cons
+            - More difficult to write in some languages
+              While most modern dynamic languages have the ability to write in a Functional style, it can go against
+              the grain with some. Even JavaScript, for instance, does not have a way to make values truly immutable.
+              Writing programs without classes goes against the grain of Ruby, and PHP does not have all the array
+              methods JavaScript has that follow a Functional methodology.
+
+            - Will never be able to implement completely
+              There is a big difference between pure academic Functional programming and practical Functional-inspired
+              programming for the web. Unless you are using a language that was built to be Functional, like Haskell,
+              there will be times you have to work within the limits of the language to do the best you can at writing
+              functional programs.
+
+            - Few libraries to speed progress (though this is changing)
+              Functional programming for the web is still fairly new, and there are not as many helpful libraries or
+              tutorials for getting started or writing efficiency as there are for say Object Oriented programs, for
+              which we have prebuilt ORMs, tons of tutorials, frameworks, etc..
