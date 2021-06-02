@@ -253,3 +253,491 @@ B. Programming Paradigms
               Functional programming for the web is still fairly new, and there are not as many helpful libraries or
               tutorials for getting started or writing efficiency as there are for say Object Oriented programs, for
               which we have prebuilt ORMs, tons of tutorials, frameworks, etc..
+C. Function JS syntax
+    1. arrays
+        a. map method:
+
+            const captains = ['Picard', 'Adama', 'Reynolds', 'Beeblebrox']
+
+            // create new array
+            const titles = captains.map(cap => `Captain ${cap}`)
+
+            // equivalent to
+            const titles = captains.map(cap => {
+                return `Captain ${cap}`
+            })
+
+            console.log('Resulting Array: ', titles)
+            // expected output: Resulting Array: ['Captain Picard', 'Captain Adama', 'Captain Reynolds', 'Captain Beeblebrox']
+            console.log('Original Array:', captains)
+            // is unchanged, expected output: Original Array: ['Picard', 'Adama', 'Reynolds', 'Beeblebrox']
+
+
+            const nums = [1, 2, 3, 4, 5]
+
+            // Internal callback
+            // ----------------------------------------------------------------------
+            const doubles = nums.map(x => x * 2)
+
+            console.log(doubles)
+            // expected output: Array [2, 4, 6, 8, 10]
+
+            // External callback
+            // ----------------------------------------------------------------------
+            const doubler = function(x) {
+                return x * 2
+            }
+
+            const doubles2 = nums.map(x => {
+                return doubler
+            })
+
+            console.log(doubles2)
+            // expected output: Array [2, 4, 6, 8, 10]
+
+            // 1. Write a map function to reverse this array:
+            const start = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+            const end = start.map(x => Math.abs(x - 11))
+            console.log(end)
+            // expected output: Array [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+
+            // ----------------------------------------------------------
+            // 2. Write a map function to print the Job: Name:
+            const shipMates = [["Mal", "Captain"], ["Wash", "Pilot"], ["Zoey", "1st Mate"], ["Jayne", "Public Relations"]]
+
+            const result1 = shipMates.map(arr => arr.reverse().join(': '))
+            console.log(result1)
+
+            // expected output: Array ["Captain: Mal", etc...]
+
+            // ----------------------------------------------------------
+            // 3. Write a map function that prints the name: even|odd
+            const awayTeam = ["Picard", "Riker", "Troy", "Data"]
+
+            const result2 = awayTeam.map((name, i) => `${name}: ${i % 2 === 0 ? 'even' : 'odd'}`)
+            console.log(result2)
+            // expected output: Array: ["Picard: even", "Riker: odd", etc...]
+
+
+            // ----------------------------------------------------------
+            // 3. Create a multidimensional array of each item and its index in the original Array
+
+            const sciFiShows = ['Manedlorian', 'Enterprise', 'Firefly', 'Battlestar Galactica']
+
+            const result3 = sciFiShows.map((show, index) => [show, index])
+            console.log(result3)
+            // expected output: Array [['Manedlorian', 0], ['Enterprise', 1], ['Firefly', 2], ['Battlestar Galactica', 3]]
+
+            // ----------------------------------------------------------
+            // 4. For each item in this array, create a multidimensional array containing the entire original array
+
+            const numbers = [1, 2, 3, 4]
+
+            const result4 = numbers.map((num, index, wholeArray) => wholeArray)
+            console.log(result4)
+            // expected output: Array [[1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]]
+
+
+            // ----------------------------------------------------------
+            // 5. One common thing we use `map` for in real life is to reformat objects to have a shape that is better for our
+            // purposes. For instance, we only care about the name and first three characters of the id for the races below.
+            // Use `map` to grab those values and create a new array with them.
+
+            var index = [
+                {key: 1, sector: 10, t_score: 18, id: '1236n7e8', value: 'Klingon'},
+                {key: 4, sector: 145, t_score: 12, id: '293847hs8', value: 'Minbari'},
+                {key: 8, sector: 214, t_score: 5, id: '283hy8347', value: 'Cylon'},
+                {key: 3, sector: 8346, t_score: 10, id: 'n9837ks857', value: 'Jawa'},
+            ]
+
+            const result5 = index.map((race) => {
+                return { name: race.value, idFirstThree: race.id.substring(0,3)}
+            })
+
+            console.log(result5);
+
+        b. filter method
+            - The filter method is a separator, we give it a function with the logic to distinguish the items we want,
+            and filter runs items in the array through that function. In the end, it creates a new array that contains
+            only the elements that our function allowed. So the ONLY difference between filter and map is that map
+            performs a function on every item in an array, and filter uses a true or false conditional on every item in
+            the array to decide if that value should be kept or discarded. This means that one key differentiator of the
+            filter method is its callback method must return either true or false. If it returns true, the value will be
+            added to the result array; if it returns false, that value is discarded.
+            - Filter is easiest to learn when you play around with it. Below, you can see how a filter is applied to the
+            values list. This function is looking to see if each value in the array resolves to ‘true’ or not. So the
+            ‘filter’ function we are running looks like this: (v == true), where ‘v’ is each value in turn. Only array
+            items where this condition is ‘true’ will be included in the new array ‘result’.
+
+                const values = ['true', true, 'yes', 'no', 1, 0, 'false', false];
+
+                const result = values.filter(v => v == true);
+
+                console.log(result);
+                // expected output: Array [true, 1]
+
+
+        c. reduce method
+            - The map and filter methods have a lot in common, they both:
+                - Run a function (callback given by the developer) on every item in an array.
+                - Pass three arguments to the function (item value, item index, whole array).
+                - Return a new array.
+            - The reduce method has some slight differences. From the name you might be able to guess that this method
+            boils our array down to a single value.
+            - For example, if you have an array of products, each with a price, you could use reduce to sum the price
+            values of each item and return a single total cost. Reduce has the special ability to keep track of a value
+            that is updated as it iterates over each item in the array. To get the total cost from an array of items
+            with a price value, you would write a function that adds an item's price to the running total and reduce
+            will run that function on each item in the array until it runs out of items and the total is found.
+            - To do this, reduce only passes the callback two arguments, the total so far - or accumulator, and the
+            current item. Another way that it differs from the first two array methods is that it does not necessarily
+            return an array. In the case of the example above, reduce would return a single integer of the sum of all
+            prices.
+            - Below, you can see how reduce is applied to the sales list. Reduce goes through the list sales and adds
+            the individual value to a running total which is what will ultimately be returned by reduce. The final
+            output of reduce on sales will be 147.49.
+
+                const sales = [120.00, 19.99, 3.50, 4.00];
+
+                const total = sales.reduce((runningTotal, currentValue) => {
+                    console.log(runningTotal, currentValue)
+                    return runningTotal + currentValue
+                })
+
+                // cycle 1: 120 19.99
+                // cycle 2: 139.99 3.5
+                // cycle 3: 143.49 4
+
+                // expected output: 147.49
+
+                // If you can follow the code above - great job! No one masters the reduce method overnight, but being able to follow the code is the first step. Below are two examples of alternate syntax that you might also see out in the wild. Can you follow these?
+
+                //  SAME AS:
+                const reducer = (runningTotal, currentValue) => runningTotal + currentValue;
+                console.log(sales.reduce(reducer));
+
+                // Look! You can even run map, filter, and reduce on array literals!
+                // SAME AS:
+                [120.00, 19.99, 3.50, 4.00].reduce((runningTotal, currentValue) => {
+                    return runningTotal + currentValue
+                })
+
+        d. summary
+
+        Map - The map method iterates over every item in the array it is called on, and performs one action on each
+        item. The action logic is held in a callback function. The map method returns a new array that is the same
+        length as the original array, but with the items updated according to the callback function logic.
+
+        Filter - The filter method iterates over every item in the array it is called on, and runs each item through a
+        pass or fail checking logic. The logic is held in a callback function which must return either true or false.
+        The filter method returns a new array that is shorter than the original array (or potentially the same length,
+        if all values passed successfully through the callback), but the values that pass through will be unchanged.
+
+        Reduce - The reduce method iterates over every item in the array it is called on, and keeps one value (for
+        instance, the sum of all prices). Each item in the array is forgotten, and the end result is a single value.
+        The uses of reduce vary greatly depending on your need, and it is typically the hardest one of the three array
+        methods to master because though its logic is not complicated, its use cases can be very creative.
+
+        That concludes our whirlwind tour of the most commonly used array methods! Practicing these will help you in
+        your day to day work, and making them second nature will really help in interviews and coding challenges.
+
+    2. Array methods for selection
+        a. flat
+            - Sometimes we have to deal with arrays within arrays - also called multidimensional arrays. The bigger and
+             more nested multidimensional arrays get, the harder they become to wrap your head around, and accessing
+             information can be a headache. flat is a tool that allows you to undo array nesting to exactly the level
+             you want.
+            - In the following code, flat is applied to arrays: nestedArr and moreNested. The first instance with
+            nestedArr, flat takes away the higher level of nesting. But with moreNested we can see when flat takes in
+            an integer parameter, it will flatten 2 levels of nesting. This returns an array without any nesting.
+
+                var nestedArr = [1, 2, [3, 4, [5, 6]]];
+                nestedArr.flat();
+                console.log(nestedArr)
+                // expected output: [1, 2, 3, 4, [5, 6]]
+
+                var moreNested = [1, 2, [3, 4, [5, 6]]];
+                moreNested.flat(2);
+                console.log(moreNested)
+                // expected output: [1, 2, 3, 4, 5, 6]
+
+        b. find
+            - Locating unique values in arrays is another indispensable ability. JavaScript find and Includes methods
+            perform similar actions, but their use cases differ. Here are their Mozilla definitions side by side:
+                - Find Method
+                    - find returns the value of the first element in the provided array that satisfies the provided
+                    testing function.
+                - Includes Method
+                    - includes determines whether an array contains a certain value among its entries, returning true or
+                     false as appropriate.
+            - find is most useful when you are not looking for a specific value. It is best to use find when you want
+            to see if any item in array meets a criteria. In this way, find is a little bit like filter, in that they
+            both run every item in array through a function to determine if the item passes the function’s requirement.
+            But, find is a little bit simpler in that it only passes a single argument (the current value) and returns
+            a single value from the array (the first one to pass the function’s test).
+
+                const bestBars = [
+                    'Mos Eisley Cantina',
+                    'Clark`s Bar',
+                    '10 Forward',
+                    'The Restaurant at the End of the Universe',
+                    'The Prancing Pony',
+                    '10 Forward',
+                ]
+
+                const test1 = bestBars.find(x => x === 'Quark`s Bar')
+                const test2 = bestBars.find(x => x === '10 Forward')
+
+                console.log(test1) //expected output: undefined
+                console.log(test2) // expected output: 10 Forward
+        c. include
+            - includes is most useful when are looking for the existence of a specific value. All you have to do is
+            provide the value you are looking for, and includes will return true if it finds it and false if it does not.
+            - It is good to note that neither find nor includes is a good tool to use if you need to know how many
+            times a value is found in an array. To do that, you would have to use map or filter.
+            - In the following code, you can see that includes only returns a true or false value. Includes can also be
+            used on strings.
+
+                const bestBars = [
+                    'Mos Eisley Cantina',
+                    'Clark`s Bar',
+                    '10 Forward',
+                    'The Restaurant at the End of the Universe',
+                    'The Prancing Pony',
+                    '10 Forward',
+                ]
+
+                const test1 = bestBars.includes('Quark`s Bar')
+                const test2 = bestBars.includes('The Prancing Pony')
+
+                console.log(test1) // expected output: false
+                console.log(test2) // expected output: true
+
+    3.  variables
+        a. let
+            - let is like var in that a value can be edited after it has been declared, but the scoping rules are a bit
+            different between the two.
+        b. const
+            - const is what we are going to focus on in this course, and right now, we are just going to look at how
+            const does not go far enough to really be considered functional. In the following example, take a close
+            look at how the consts ‘currentBook’ and ‘bookDetails’ behave differently. We can’t edit ‘currentBook’ -
+            as expected - but we CAN edit ‘bookDetails’. Feel free to run and edit the code below to get a feel for
+            what you can and can’t do.
+
+                const currentBook = 'The Time Machine'
+
+                const bookDetails = {
+                   title: 'The Time Machine',
+                   author: 'H. G. Wells',
+                   totalPages: 84,
+                   currentPage: 42
+                }
+
+                const library = ['Dune', 'Nineteen Eighty-Four', 'Ender`s Game', 'Hyperion', 'Fahrenheit 451']
+
+                currentBook = 'Stranger in a Strange Land'
+                // results in error, can't edit const value
+
+                bookDetails = {
+                   title: 'I, Robot',
+                   author: 'Isaac Asimov',
+                   totalPages: 253,
+                   currentPage: 21
+                }
+                // results in error, bookDetails is read-only
+
+                bookDetails.currentPage = 75
+                // this works! We can update values within a const object
+
+                library = ['Dune', 'Nineteen Eighty-Four']
+                // results in error, can't redeclare library
+
+                library.concat('The Hitchiker`s Guide to the Galaxy')
+                // this works! We can update items in the array or add to it
+                // Note that concat is the best non-mutative way to add items to an array
+
+            https://hackernoon.com/why-you-shouldnt-use-var-anymore-f109a58b9b70
+            https://dev.to/johnwolfe820/should-you-never-truly-use-var-bdi
+
+        c. object freeze
+
+            // ----------------------------------------------------------
+            // OBJECT FREEZE EXAMPLES
+            // ----------------------------------------------------------
+
+            const currentShow = {
+                title: 'Dr. Who',
+                seasons: 11,
+                currentSeason: 4
+            }
+
+            // as a const, we can do this:
+            currentShow.currentSeason = 5
+            // expected output: { title: 'Dr. Who', seasons: 11, currentSeasons: 5 }
+
+            // but if we freeze the object
+            Object.freeze(currentShow);
+
+            currentShow.currentSeason = 6;
+            // this would actually cause an error
+
+            console.log(currentShow)
+            // expected output: {title: 'Dr. Who', seasons: 11, currentSeasons: 5 }
+            // now that it is frozen we can not update the current season of the current show
+
+        - freeze
+            - A frozen object can no longer be changed.” A frozen object can have no properties added to it, removed
+             from it, or its values edited. It effectively makes an immutable object.
+    4. keys()
+        - This method returns an array of strings of all an object’s property names. This is unusual because most
+          methods we run on objects are more interested in the values.
+        - Be aware though, this won’t always get the results you think. Along with the properties you are aware of in
+          an object, this might also return other properties belonging to the prototype.
+    5. assign()
+
+        let state = {
+            name: 'Wash',
+            ship: {
+                name: 'Serenity',
+                class: 'Firefly'
+            }
+            role: 'Pilot',
+            favoriteThing: {
+                item: "Toy",
+                details: {
+                        type: 'Toy Tyrannosaurus Rex'
+                }
+            }
+        }
+
+        const newState = {
+            name: 'Mal',
+            role: 'Captain',
+            favoriteThing: {
+                item: "Not complicated"
+            },
+            history: ["Browncoat sergeant"]
+        }
+
+        state = Object.assign(state, newState);
+        // Object.assign(state, newState)
+
+        console.log(state)
+        // expected output:
+        // { name: 'Mal',  ship: { name: 'Serenity', class: 'Firefly' },
+        //  role: 'Captain',
+        //  favoriteThing: { item: 'Not complicated' },
+        //  history: [ 'Browncoat sergeant' ] }
+
+    6. method examples
+
+        // ----------------------------------------------------------
+        // OBJECT FREEZE EXERCISE
+        // Create your own object and freeze it!
+        // Below is an example of a solution to the exercise.
+        // --------------------------------------------------------
+
+        // much like the example you saw in the video create an object
+
+        const person = {
+            name: 'Synthia',
+            age: 12
+        }
+        console.log(person)
+        // expected output: {name: 'Synthia', age: 12}
+
+        person.age = 13
+        console.log(person)
+        // expected output: {name: 'Synthia', age: 13}
+
+        Object.freeze(person)
+
+        person.age = 14
+        console.log(person)
+        // expected output: {name: 'Synthia', age: 13}
+
+        // ----------------------------------------------------------
+        // OBJECT KEYS EXERCISES
+        // Use Object.keys with the map method to print "This character has a(n) [property-name]" for each property.
+        // ----------------------------------------------------------
+        // GIVEN
+        const character = {
+            id: '12mn18udcbv9823',
+            name: 'Chewbacca',
+            race: 'Wookie',
+            planet: 'Kashyyyk',
+            job: 'First Mate'
+        }
+
+        // SOLUTION CODE
+        const keys = Object.keys(character)
+
+        keys.map(key => {
+            console.log(This character has a(n) ${key})
+            return This character has a(n) ${key}
+        })
+
+        // Expected Output:
+        // This character has a(n) id.
+        // This character has a(n) name.
+        // This character has a(n) race.
+        // This character has a(n) planet.
+        // This character has a(n) job.
+        // [ 'This character has a(n) id',  'This character has a(n) name',  'This character has a(n) race', 'This character has a(n) planet', 'This character has a(n) job' ]
+
+        // ----------------------------------------------------------
+        // OBJECT ASSIGN EXERCISES
+        // Merge another character into this state. Keep at least one value and change at least one value. Below is an example of a solution to the exercise.
+        // ----------------------------------------------------------
+
+        let state = {
+            name: 'Wash',
+            ship: {
+                name: 'Serenity',
+                class: 'Firefly'
+            },
+            role: 'Pilot',
+            favoriteThing: {
+                item: "Toy",
+                details: {
+                    type: 'Toy Tyrannosaurus Rex'
+                }
+            }
+        }
+
+        const incomingState = {
+            name: 'Mal',
+            role: 'Captain',
+            favoriteThing: {
+                item: "Not complicated"
+            },
+            history: ["Browncoat sergeant"]
+        }
+
+        state = Object.assign(state, incomingState);
+        // expected output:
+        // state = {
+        //     name: "Mal",
+        //     ship: {
+        //         name: "Serenity",
+        //         class: "Firefly"
+        //     },
+        //     role: "Captain",
+        //     favoriteThing: {
+        //         item: "Not complicated"
+        //     },
+        //     history: ["Browncoat sergeant"]
+        // }
+
+
+
+
+
+
+
+
+
+
+
+
