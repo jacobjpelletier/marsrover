@@ -730,14 +730,779 @@ C. Function JS syntax
         //     history: ["Browncoat sergeant"]
         // }
 
+D. Functional Programming in JS
+    1. intro to FP in JS
+        a. Higher-Order Functions are not only used in Functional programming but are a central part of Functional
+        programs specifically. Higher-Order Functions (HOFs) allow us to string together many functions. HOFs have
+        slightly different definitions across programming languages, but in JavaScript, you can say that a function is
+        Higher-Order if it:
+            - Takes in a function as an argument (a callback)
+            - Returns a function
+        b. We are already quite familiar with functions that take a callback. Map, Filter, and Reduce are all HOFs.
+        When a function returns another function, it forms a closure around that function, typically to wrap it with
+        extra functionality. HOFs are an important tool for creating more-complex Functional programs in JavaScript.
+
+            // Doubling
+            const nums = [1, 2, 3, 4, 5]
+            const doubles = nums.map(x => x * 2)
+
+            console.log(doubles)
+            // expected output: Array [2, 4, 6, 8, 10]
+
+            // Equivalent to:
+            const doubler = function (x) {
+                return x * 2
+            }
+
+            const doubles2 = nums.map(doubler)
+
+            // inside map…
+            // doubler(1, 0, [1, 2, 3, 4, 5])
+
+            console.log(doubles2)
+            // expected output: Array [2, 4, 6, 8, 10]
+
+    2. functional data manipulation
+        a. tips
+            - determine data points and shape you need
+            - locate one individual item and use it as an example
+            - working up the data tree might be easier than working down the tree
+            - extract the info you need as soon as you can
+    3. functional DOM manipulations
+        a. functional style
+
+            const root = document.getElementById('root')
+            // First Pass - Basic Layout
+            const render = root => {
+                root.innerHTML = `<div> I EXIST! </div>`
+            }
+
+            render(root)
+
+            // Second Pass - Easier to add more layout
+            const render = root => {
+                root.innerHTML = App()
+            }
+
+            const Welcome = () => {  // pure function
+
+                return `Welcome to my JavaScript Program!`
+            }
+
+            const App = () => { // higher-order and pure function
+                return `
+                    <h1>${Welcome()}<h1>
+                   <div> I EXIST! </div>
+                `
+            }
+            render(root)
+
+        b. state
+            - We have seen that we can create elements in our JavaScript program and make them appear in the DOM, but
+            now how do we hold onto values, take in data and do all the other things necessary for an interactive app?
+            That is the focus of this section. We need a place to hold information. Our app is likely going to collect
+            information from users or receive it from an API, and we need an organized way to handle data from any
+            source. Functional Programming stays away from creating a global state, but in a real life web application,
+             sticking to that rule proves difficult and overly complicated to do. Instead of no global state, what we
+             can do is create just one place for all that global information to live. We will create an immutable object
+             to store data - Functional Programming has no rules against that - and we will use this immutable object as
+             the single source of truth for our application’s data.
+
+                const store = {
+                    user: {
+                        first_name: ‘John’,
+                        last_name: ‘Doe’
+                    }
+                }
+
+            - Store is a generic term for an object that stores application data. That will be the purpose of this
+            immutable object, so we named it store and it can now be passed as an argument into our functions.
+
+                const render = (root, state) => {
+                   root.innerHTML = App(state)
+                }
+
+                const Welcome = (name) => {
+                   return `Welcome, ${name} to my JavaScript Program!`
+                }
+
+                const App = (state) => {
+                   return `
+                       <h1>${Welcome(state.user.first_name)}<h1>
+                      <div> I EXIST! </div>
+                   `
+                }
+
+                render(root, store)
+
+            - Here we have taken the code that generated the DOM elements in the last section and passed our new store
+            object to it so that data is accessible to our component functions. One more thing, if you have recreated
+            these two sections on your own computer and tried to see the results in your browser, there was likely a
+            problem and nothing showed up on the screen except what was in your index.html file. Why’s that? Because we
+            are missing one function that tells the JavaScript when to run. You might have seen this function from other
+            Javascript programs for the browser. We need to wait for the load event to make sure that our JavaScript
+            doesn’t run before the DOM element ‘root’ exists.
+
+                window.addEventListener('load', () => {
+                   render(root, store)
+                })
+
+        c. example
+
+            // Here is the code from the example text
+
+            const root = document.getElementById('root')
+
+            const Welcome = () => {
+                return `Welcome to my JavaScript Program!`
+            }
+
+            const App = () => {
+                return `
+                    <h1>${Welcome()}<h1>
+                    <div> I EXIST! </div>
+                `
+            }
+
+            const render = root => {
+                root.innerHTML = App()
+            }
+
+            render(root)
+
+            // Add a new Menu component that takes in a show argument which is either true or false
+            // Show this content if show is true:
+            {/* <nav>
+                <ul>
+                    <li>About Us</li>
+                    <li>Contact Us</li>
+                    <li>Login</li>
+                </ul>
+            </nav> */}
+
+            // and this content if show is false:
+            {/* <nav>Menu</nav> */ }
+
+            const Menu = (show) => {
+                if(show) {
+                    return (`
+                            <nav>
+                                <ul>
+                                    <li>About Us</li>
+                                    <li>Contact Us</li>
+                                    <li>Login</li>
+                                </ul>
+                            </nav>
+                        `)
+               }
+                return `<nav>Menu</nav>`
+            }
 
 
+            // Given
+
+            let store = {
+                user: {
+                    first_name: 'John',
+                    last_name: 'Doe'
+                }
+            }
+
+            const render = (root, state) => {
+                root.innerHTML = App(state)
+            }
+
+            const Welcome = (name) => {
+                return `Welcome, ${name} to my JavaScript Program!`
+            }
+
+            const App = (state) => {
+                return `
+                   <h1>${Welcome(state.user.first_name)}<h1>
+                  <div> I EXIST! </div>
+               `
+            }
+
+            window.addEventListener('load', () => {
+                render(root, store)
+            })
+            // But what if state changes at some point in our app?
+            // Using the object methods we have learned so far in this course,
+            // create a function called updateStore that takes in the old state, the new state, and updates the old state with any new information
+            // This won't be a pure function, instead of a return, call the render method again
+
+            const updateStore = (store, newState) => {
+                store = Object.assign(store, newState)
+                render(root, store)
+            }
+
+        https://eloquentjavascript.net/05_higher_order.html
+
+E. Going further with functional JS
+    1. intro
+        a. We’re in the home stretch! We’ve finished our investigation of the Javascript tools we have to write
+        Functional programs, and we’ve seen first hand how those tools can be used to create an interactive program
+        without the use of any external libraries. Now it's time to get a wider view of all that’s possible with
+        Functional Programming and some of the awesome libraries built on top of these powerful concepts.
+        b. In this lesson, we will do a very high-level overview of a few of the most common Functional libraries for
+        JavaScript - ImmutableJS, Ramda, RxJS, and Redux. The point of this lesson is not to teach you all there is to
+        know about these awesome tools, but only to show three real life uses of the Functional concepts we have learned.
+        Here and there I will stop to explain a new concept or look at some code, but the sole focus of this section
+        will be to highlight how these tools put different Functional practices to good use. None of the lessons in
+        this section should be seen as a tutorial on how to set up or use these libraries in an application. To go into
+        more detail for any of these technologies would require another course of its own, so instead I will provide
+        resources for where you can continue learning about each library on your own.
+
+    2. persistent data structures
+        a. immutable DS
+            - Before we jump into our first library, ImmutableJS, we need to talk about once concept - Immutable Data
+            Structures. When I first introduced the concept of immutability, I intentionally did not touch on one very
+            important part of immutability -- space. If variables cannot change the values they hold, how do your
+            programs not need huge amounts of memory to hold all those copies of old data? If even the smallest change
+            to a value occurs, the Functional Paradigm would say that we need to create a unique variable - even if 99%
+            of it is identical to the previous. This could not possibly be an efficient use of memory, especially for
+            large programs, so how is this handled? Instead of making copies of variables, we make trees of data and
+            have the variables reference values in the tree. That is a lot of new words and is probably confusing, so
+            we will walk through an example in the next video.
+            - https://www.youtube.com/watch?v=Wo0qiGPSV-s
+            - In Javascript, we are going to build a naive example of an array type persistent data structure.
+            - First, we will create a class - we’ll call it PersistentArray. We are creating a class because it is the
+            easiest way to wrap an array with extra functionality. Again, this wouldn’t really be something you would
+            use in a real application, it is only an example to highlight some of the features of a persistent data
+            structure. So here is our new kind of persistent array:
+
+                class PersistentArray {
+                        constructor(items = []) {
+                                this.persistentArray = items
+                        }
+                }
+
+                const a = new PersistentArray([1, 2, 3])
+                console.log("A", a)
+
+            - You can see that PersistentArray takes in an array of items or defaults to an empty array if no arguments
+            are provided. Then our class has a property of persistentArray, this will be a normal javascript array.
+            - Now imagine that we want to add a new item to this array. But we can’t just push a new value onto the
+            array, because we can’t edit the original. So our PersistentArray class isn’t going to let us edit the
+            original, it is going to five us a new array with the change made on that array by default. We are going
+            to implement our own “push” method to work on our PersistentArray.
+
+                class PersistentArray {
+                        constructor(items = []) {
+                                this.persistentArray = items
+                        }
+
+                        push(newItem) {
+                             return new PersistentArray(this.persistentArray.concat(newItem))
+                         }
+                }
+
+                const a = new PersistentArray([1, 2, 3])
+                console.log("A", a)
+
+                const b = a.push(4)
+                console.log("A", a)
+                console.log("B", b)
+
+                /* output
+                    A PersistentArray { persistentArray: [ 1, 2, 3 ] }
+                    A PersistentArray { persistentArray: [ 1, 2, 3 ] }
+                    B PersistentArray { persistentArray: [ 1, 2, 3, 4 ] }
+                */
+
+            - You can see now that we are creating a push method which takes in one new value and returns a whole new
+            class instance with an array that contains the new item. And you can see when we console log the results
+            that array A is unchanged and the new array B contains the array with ‘4’ added to it. So in persistent
+            data structures, you can see that once a value is created it can never be changed.
+            - Where our example differs from a truly persistent data structure - and why this is such a naive example -
+            is the memory sharing. When our custom push method creates the new class instance, it takes up an entirely
+            new spot in memory, it is saved as its own entity. But in a true implementation of this, array A and array
+            B would share memory, only differing by one node (the new ‘4’ value we added to B).
+            - So now let’s explore the other side and implement a pop method. Take a look at this code.
+
+                class PersistentArray {
+                    constructor(items = []) {
+                                this.persistentArray = items
+                    }
+
+                    push(newItem) {
+                                return new PersistentArray(this.persistentArray.concat(newItem))
+                    }
+
+                    pop() {
+                                let poppedArray = [...this.persistentArray]
+                                poppedArray.pop()
+                                return new PersistentArray(poppedArray)
+                    }
+                }
+
+                const a = new PersistentArray([1, 2, 3])
+                console.log("A", a)
+
+                const b = a.push(4)
+                console.log("A", a)
+                console.log("B", b)
+
+                const c = a.pop()
+                console.log("A", a)
+                console.log("B", b)
+                console.log("C", c)
+
+        3. immutableJS
+            a. First, because Immutable is an external library, we have to add it to our project. We can do that one of
+            two ways: via a script tag in an HTML page, or via a node module. Choose whichever one is more convenient
+            for your application. For this course, we are going to use the browser script tag implementation. Here is
+            an example of how ImmutableJS is implemented.
+
+                // Put this in an html page
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/immutable/3.8.2/immutable.min.js"></script>
+
+                // Or, you can install `immutable` module using npm and import this module in a js file
+                npm install immutable // install immutable from the terminal
+                const Immutable = require('immutable'); // add this line in js file
+
+            b. syntax
+
+                // Getting and Setting values using Immutable module
+
+                // Immutable objects are called ‘maps’
+                const Immutable = require('immutable'); // import immutable module
+
+                // this is how we declare an immutable Object
+                const map1 = Immutable.Map({ a: 1, b: 2, c: 3 });
 
 
+                // Here is an important part. We can’t update map1, so instead we have to make the change on map2.
+                const map2 = map1.set('b', 50);
+
+                // Because of this, the old state of map1 is still available
+                map1.get('b'); // 2
+
+                // And map2 shows our update.
+                map2.get('b'); // 50
+                console.log(map2.get('b'))
+
+                // equality check
+                map1.equals(map2); // false
+                console.log(map1.equals(map2))
+
+                // Use with ordinary objects
+                const state1 = Immutable.Map({ a: 1, b: 2, c: 3, d: 4 });
+                const state2 = Immutable.Map({ c: 10, a: 20, t: 30 });
+                const obj = { d: 100, o: 200, g: 300 };
+                const map3 = state1.merge(state2, obj);
+                console.log(map3.toJS()) // toJS() is a helper method to convert immutable object into javascript dictionary
+
+                // If you open the returned object, you can see that it isn't an ordinary object
+                // you'll find all the properties under "entries"
+
+                // Use with ordinary arrays
+                // An immutable array is declared as a `List` like this:
+                const numbers = Immutable.List([1, 2, 3]);
+
+                //But Immutable can also work with plain JS arrays
+                const otherNumbers = [4, 5, 6]
 
 
+            c. ex
+
+                PART 1. Getting and Setting values
+                // Given the following object, make an update that turns name to 'Mal' and role to 'Captain'
+
+                const state1 = Immutable.Map(const map1 = Immutable.Map({
+                    name: 'Wash',
+                    ship: {
+                        name: 'Serenity',
+                        class: 'Firefly'
+                    },
+                    role: 'Pilot',
+                    favorite_thing: {
+                        item: "Toy",
+                        details: {
+                            type: 'Toy Tyrannosaurus Rex'
+                        }
+                    }
+                });
+
+                // SOLUTION
+                // You can do this:
+                const state2 = state1.set('name', 'Mal')
+                const state3 = state2.set('role', 'Captain')
+
+                // But Immutable also allows you to do this:
+                const state2 = state1.set('name', 'Mal').set('role', 'Captain')
+
+                // -----------------------------------------------------------------
+                // -----------------------------------------------------------------
+
+                // PART 2. More with objects
+                // This is a normal javascript object. It is very different from an Immutable Map
+                const obj = { d: 100, o: 200, g: 300 };
+
+                // But thankfully, normal javascript objects are still valid in Immutable
+                // Notice that here we can merge a normal object into an Immutable Map
+                const map3 = state1.merge(state2, obj);
+
+                // But also notice how different the two are when we console log map3
+                console.log(map3)
+
+                // YOUR TURN --------------------------------------------------------------
+                // Can you locate the contents of our variable 'obj' inside the Immutable Map map3?
+                console.log(map3)
+
+                // SOLUTION --------------------------------------------------------------
+                // If you open the Immutable map3 in inspect element, you can see that it isn't an ordinary object
+                // you'll find all the properties under "entries"
+
+                // -----------------------------------------------------------------
+                // -----------------------------------------------------------------
+
+                // PART 3. Arrays and Immutable Lists
+
+                // An immutable array is called a LIST, and is declared like this:
+                const numbers = List([1, 2, 3]);
+
+                // We can turn normal JS arrays into Immutable Lists like this:
+                const plainArray = [ 1, 2, 3, 4 ]
+                const listFromPlainArray = List(plainArray)
+                console.log(listFromPlainArray)
+
+                // we can declare a new Immutable List
+                const myList = List([ 'stuffed t-rex' ]);
+                console.log(Array.from(myList));
+
+                // and we can use the set method again to add or update values. Just provide the index first and value second
+                const myList1 = myList.set(1, 'toy lightsaber');
+                console.log(Array.from(myList1)); // [ "stuffed t-rex", "toy lightsaber" ]
+
+                // but, in order to not need to supply the index, we can also add new values with push
+                const myList2 = myList1.push('Picard bobblehead')
+                console.log(Array.from(myList2));
+
+                // YOUR TURN --------------------------------------------------------------------------
+
+                // 1. Turn the following array into an Immutable array
+                // 2. Add a character
+
+                // -----------------------------------------------------------------
+                // -----------------------------------------------------------------
 
 
+                // STRETCH CHALLENGE ----------------------------------------------------------------------
+                // 3. Remove Jabba the Hut from the Immutable List
+                // look up in the documentation how you would remove a character from the Immutable list
+
+                const characters = [
+                  {
+                    name: 'Marvin the Paranoid Android',
+                    role: 'First Mate',
+                    universe: 'Hitchhikers Guide to the Galaxy',
+                    weapon: 'severe depression',
+                    powerLevel: 1000
+                  },
+                  {
+                    name: 'Jabba the Hutt',
+                    role: 'villain',
+                    universe: 'Star Wars',
+                    weapon: 'henchmen',
+                    powerLevel:  200
+                  },
+                  {
+                    name: 'Zoë Alleyne Washburne',
+                    role: 'First Mate',
+                    universe: 'Firefly',
+                    weapon: 'Winchester Model 1892 rifle',
+                    powerLevel: 160
+                  },
+                  {
+                    name: 'Peter Venkman',
+                    role: 'Ghostbuster',
+                    universe: 'Ghostbusters',
+                    weapon: 'proton pack',
+                    powerLevel: 120
+                  },
+                  {
+                    name: 'Kathryn Janeway',
+                    role: 'Captain',
+                    universe: 'Star Trek',
+                    weapon: 'Wit',
+                    power_level: 140
+                  }
+                ]
+
+                // SOLUTION
+
+                const immutableCharacters = List(characters).push({
+                    name: 'Yoda',
+                    role: 'Jedi Master',
+                    universe: 'Star Wars',
+                    weapon: 'The Force',
+                    powerLevel: 900
+                })
+                console.log(Array.from(immutableCharacters))
+
+                // STRETCH SOLUTION
+                const withoutJabba = immutableCharacters.delete(1)
+                console.log(Array.from(withoutJabba))
+
+                // or, all in one line, you could do:
+                const allatonce = List(characters).push({
+                    name: 'Yoda',
+                    role: 'Jedi Master',
+                    universe: 'Star Wars',
+                    weapon: 'The Force',
+                    powerLevel: 900
+                }).delete(1)
+                console.log(Array.from(allatonce))
+
+        4. rxjs
+            a. // Browsers won't run RxJS code on their own, but thankfully RxJS created a tool called the RxJS playground!
+               // Take the code below and paste it into https://rxjs-playground.github.io/#/ to see it run
 
 
+               // A function runs once and returns one set of information
+               // An observable is like a function that runs for a period of time and can return many sets of information - a stream of information
+
+               const observable = new Rx.Observable(subscriber => {
+                 subscriber.next(1);
+                 subscriber.next(2); // "return" another value
+                 subscriber.next(3); // "return" another value
+                 setTimeout(() => {
+                   subscriber.next(4);
+                   subscriber.complete();
+                 }, 1000);
+               });
+
+               console.log('just before subscribe');
+
+               observable.subscribe({
+                 next(x) { console.log('got value ' + x); },
+                 error(err) { console.error('something wrong occurred: ' + err); },
+                 complete() { console.log('done'); }
+               });
+
+               console.log('just after subscribe');
+
+               // the word 'next' is a special RxJS observable word that allows the observable to "return" multiple things over a period of time
+
+
+               // There are three types of values an Observable Execution can deliver:
+
+               // "Next" notification: sends a value such as a Number, a String, an Object, etc.
+               // "Error" notification: sends a JavaScript Error or exception.
+               // "Complete" notification: does not send a value.
+
+               // "Next" notifications are the most important and most common type: they represent actual data being delivered to a subscriber.
+               // "Error" and "Complete" notifications may happen only once during the Observable Execution, and there can only be either one of them.
+
+        5. implementing immutableJS
+            a. WATCH OUT! One important thing to note is that nested objects have to be declared as Immutable maps just
+            like top level ones. Otherwise, they will be stored as normal JS objects, which Immutable handles
+            differently. You can see the difference below.
+
+                // Nest 1
+                const currentShow = Immutable.Map({
+                    title: 'Dr. Who',
+                    seasons: 11,
+                    currentSeason: 4,
+                    characters: {
+                        main: 'The Doctor',
+                        supporting: ['Dalek1']
+                    }
+                })
+
+                // Nest 2
+                const currentShow = Immutable.Map({
+                    title: 'Dr. Who',
+                    seasons: 11,
+                    currentSeason: 4,
+                    characters: Immutable.Map({
+                        main: 'The Doctor',
+                        supporting: List(['Dalek1'])
+                    })
+                })
+
+            - Nest 1 is not the same as Nest 2. The main difference is that the nested object characters is declared
+            with Immutable.Map in Nest 2. characters in Nest 1 will not be immutable while characters in Nest 2 will be.
+
+        6. ex
+
+            let store = Immutable.Map({
+                user: Immutable.Map({
+                    firstName: 'John',
+                    lastName: 'Doe'
+                }),
+            })
+
+            function updateStore(state, newState) {
+                store = state.merge(newState)
+                render(root, store)
+            }
+
+            updateStore(store, newState)
+            console.log(store.getIn(['user', 'name']))
+
+    7. rxjs observer
+
+        // A function runs once and returns one set of information
+        // An observable is like a function that runs for a period of time and can return many sets of information - a stream of information
+
+        // An observable returns a stream of information
+        // An observer (here, observable.subscribe) is how we ‘listen’ or subscribe to data being returned by an observable.
+
+        const observable = new Rx.Observable(subscriber => {
+          subscriber.next(1);
+          subscriber.next(2); // "return" another value
+          subscriber.next(3); // "return" another value
+          setTimeout(() => {
+            subscriber.next(4);
+            subscriber.complete();
+          }, 1000);
+        });
+
+        console.log('just before subscribe');
+
+        observable.subscribe({
+          next(x) { console.log('got value ' + x); },
+          error(err) { console.error('something wrong occurred: ' + err); },
+          complete() { console.log('done'); }
+        });
+
+        console.log('just after subscribe');
+
+        // the word 'next' is a special RxJS observable word that allows the observable to "return" multiple things over a period of time
+
+
+        // There are three types of values an Observable Execution can deliver:
+
+        // "Next" notification: sends a value such as a Number, a String, an Object, etc.
+        // "Error" notification: sends a JavaScript Error or exception.
+        // "Complete" notification: does not send a value.
+
+        // "Next" notifications are the most important and most common type: they represent actual data being delivered to a subscriber.
+        // "Error" and "Complete" notifications may happen only once during the Observable Execution, and there can only be either one of them.
+
+    8. rambda
+        a. Ramda is a library of functions that help JavaScript developers write better Functional code. Where RxJS is
+        a whole new way to think about and interact with data streams and events, Ramda’s goal is to do an excellent
+        job of providing JavaScript developers with truly Functional tools, and a lot of developers think they have
+        done a really good job at that.
+        - Some cool things about Ramda:
+            - Each function is self-contained, pure, side effect free, and does not mutate anything
+            - Each function is written in JavaScript, so with the amount of JavaScript you know now, you can go to the
+            source code and be able to understand how they built their function
+
+    9. functional redux
+        a.  The actions of the reducer can be compared to a teller at a bank. As a bank patron (event) you want the
+        teller to do something to your account such as withdraw, deposit, or create an account (actions) and the teller
+        (reducer) is able to make changes to the vault (store) where your money (data) is stored.
+        b. Redux is a library typically imported into larger applications to manage and represent state in your
+        application with a single Javascript object. Redux uses pure functions called Reducers to enact updates on
+        the state object which is represented by the immutable store object. This is straight from their documentation:
+            - “Reducers are just pure functions that take the previous state and an action, and return the next state.”
+        c. Oftentimes, reducers are written as functions that contain case statements. Take a look at this example
+        reducer from their docs:
+
+            import { createStore, combineReducers } from 'redux'
+            const SET_NAME = 'SET_NAME'
+            const SET_AGE = 'SET_AGE'
+            function user(state = initialUserState, action) {
+               switch (action.type) {
+                   case SET_NAME: {
+                       return {
+                           ...state,
+                           name: action.name,
+                       }
+                   }
+                   case SET_AGE: {
+                       return {
+                           ...state,
+                           age: action.age,
+                       }
+                   }
+               }
+            }
+            const ADD_TODO = 'ADD_TODO'
+            const COMPLETE_TODO = 'COMPLETE_TODO'
+            const initialState = {
+               todos: []
+            }
+            function todos(state = initialState, action) {
+             switch (action.type) {
+               case ADD_TODO: {
+                   const { todos } = state
+                   return {
+                       ...state,
+                       todos: [...todos, action.todo],
+                   }
+               }
+               case COMPLETE_TODO: {
+                   const { todos } = state
+                   const index = todos.find(todo => todo.id == action.id)
+                   toods[index].comleted = true
+                   return {
+                       ...state,
+                       todos,
+                   }
+               }
+               default:
+                 return state
+             }
+            }
+            const reducers = combineReducers({
+               todos,
+               user,
+            })
+            const store = createStore(reducers)
+
+        d. The ellipses before state is called “spreading” the object, which means to return the original value for
+        state, except where it is different from the portion of state that was updated, in this case text and completed.
+        Redux is a great example of how you can accomplish a lot by making good use of simple concepts.
+        e. Functional Highlights of Redux
+            - Redux is a big topic and this is not a Redux tutorial. What is important to this course is that Redux has
+            found great success among developers because it uses Functional programming practices and is a great example
+            of these power concepts being used in the real world.
+            - Here are the Functional highlights of the Redux library:
+                - A read-only -- or immutable -- state. Reducers don’t update state; they return a brand new object.
+                - Pure Function reducers to handle Actions. This means that no actions in our entire app can be affected
+                by Side Effects. This is a huge reason Redux is so effective.
+                - This careful Functional flow of data from event to store means that the same action, if called twice,
+                will have the same effect on the whole application.
+
+
+        e. reducer ex
+
+            import { DAMAGE_SHIELD, REPAIR_SHIELD } from './actions'
+
+            const initialState = {
+                shieldLevel: 100,
+            }
+
+            const shieldsReducer = (state = initialState, action) => {
+                switch (action.type) {
+                    case DAMAGE_SHIELD:
+                        const { amount } = action
+                        let { shieldLevel } = state
+
+                        shieldLevel -= amount
+
+                        return {
+                            ...state,
+                            shieldLevel,
+                        }
+
+                    case REPAIR_SHIELD:
+                        const { amount } = action
+                        let { shieldLevel } = state
+
+                        shieldLevel += amount
+
+                        return {
+                            ...state,
+                            shieldLevel,
+                        }
+                }
+            }
+
+        
 
